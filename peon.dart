@@ -20,7 +20,7 @@ void main() {
 
 Future<YamlMap> readConfiguration() {
   File config = new File("Peonfile.yaml");
-  Completer<bool> completer = new Completer<bool>();
+  Completer<YamlMap> completer = new Completer<YamlMap>();
   config.exists().then((bool result) {
     if(result) {
       config.readAsString().then((String fileContents) {
@@ -60,18 +60,21 @@ void runTasks() {
 }
 
 void runTask(String task) {
-  File taskFile = new File("../tasks/${task}.dart");
+  File taskFile = new File("tasks/${task}.dart");
   taskFile.exists().then((bool exists) {
     if(exists) {
       Isolate.SendPort port = Isolate.spawnUri(taskFile.path);
       port.call(config['${task}']).then((String result) {
         print(result);
       });
+    } else {
+      print('could not find task! $task');
+      exit(1);
     }
   });
 }
 void runPubTask(String pubTask) {
-  File pubTaskFile = new File("../packages/peon-${pubTask}/${pubTask}.dart");
+  File pubTaskFile = new File("packages/peon-${pubTask}/${pubTask}.dart");
   pubTaskFile.exists().then((bool exists) {
     if(exists) {
       Isolate.SendPort port = Isolate.spawnUri(pubTaskFile.path);
