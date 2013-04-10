@@ -6,3 +6,4 @@ homepage: https://github.com/Daegalus/peon
 dependencies:
   logging: any
   unittest: any
+  yaml: any
