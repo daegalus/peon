@@ -4,7 +4,9 @@ main() {
   Isolate.ReceivePort port = Isolate.port;
 
   port.receive((Map map, Isolate.SendPort replyTo) {
-    print("${map['config']['message']}");
-    replyTo.call("[hello-world] Theoretically should have run dartdoc.").then((value) => print(value));
+    for(String file in map['files']) {
+      print("Generating Doc for $file");
+    }
+    replyTo.call("[docgen] Theoretically should have run dartdoc on all files.").then((value) => print(value));
   });
 }

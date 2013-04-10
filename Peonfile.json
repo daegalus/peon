@@ -1,0 +1,18 @@
+{
+    "pubtasks": [
+        "hello-world"
+    ],
+    "tasks": [
+        "docgen"
+    ],
+    "hello-world": {
+        "config": {
+            "message": "Hello World! :D"
+        }
+    },
+    "docgen": {
+        "files": [
+            "peon.dart"
+        ]
+    }
+}

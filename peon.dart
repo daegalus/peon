@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:isolate' as Isolate;
+import 'dart:json' as JSON;
 import 'package:logging/logging.dart';
 import 'package:yaml/yaml.dart';
 
-YamlMap config = new Map();
+Map config = new Map();
 Logger log = new Logger("Peon");
 
 void main() {
-  readConfiguration().then((YamlMap result) {
+  readConfiguration().then((Map result) {
     if(result.length != 0) {
       config = result;
       runTasks();
@@ -18,14 +19,13 @@ void main() {
   });
 }
 
-Future<YamlMap> readConfiguration() {
-  File config = new File("Peonfile.yaml");
-  Completer<YamlMap> completer = new Completer<YamlMap>();
+Future<Map> readConfiguration() {
+  File config = new File("Peonfile.json");
+  Completer<Map> completer = new Completer<Map>();
   config.exists().then((bool result) {
     if(result) {
       config.readAsString().then((String fileContents) {
-        YamlMap configuration = loadYaml(fileContents);
-        print(configuration);
+        Map configuration = JSON.parse(fileContents);
         completer.complete(configuration);
       },
       onError: (AsyncError e) {
@@ -48,8 +48,6 @@ Future<YamlMap> readConfiguration() {
 }
 
 void runTasks() {
-  print(config);
-
   for(String pubTask in config['pubtasks']) {
     runPubTask(pubTask);
   }
@@ -63,13 +61,12 @@ void runTask(String task) {
   File taskFile = new File("tasks/${task}.dart");
   taskFile.exists().then((bool exists) {
     if(exists) {
-      Isolate.SendPort port = Isolate.spawnUri(taskFile.path);
-      port.call(config['${task}']).then((String result) {
+      Isolate.SendPort port = Isolate.spawnUri(taskFile.fullPathSync());
+      port.call(config[task]).then((String result) {
         print(result);
       });
     } else {
-      print('could not find task! $task');
-      exit(1);
+      print('$task does not exist.');
     }
   });
 }
@@ -77,10 +74,13 @@ void runPubTask(String pubTask) {
   File pubTaskFile = new File("packages/peon-${pubTask}/${pubTask}.dart");
   pubTaskFile.exists().then((bool exists) {
     if(exists) {
-      Isolate.SendPort port = Isolate.spawnUri(pubTaskFile.path);
-      port.call(config['${pubTask}']).then((String result) {
+      print(pubTaskFile.fullPathSync());
+      Isolate.SendPort port = Isolate.spawnUri(pubTaskFile.fullPathSync());
+      port.call(config[pubTask]).then((String result) {
         print(result);
       });
+    } else {
+      print('$pubTask does not exist.');
     }
   });
 }

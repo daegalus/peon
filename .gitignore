@@ -1,5 +1,8 @@
 # IntelliJ files
 .idea/
 *.iml
+out/
+
+# Pub stuff
 packages
 pubspec.lock
