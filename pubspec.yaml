@@ -1,0 +1,8 @@
+name: peon
+version: 0.0.1
+author: Yulian Kuncheff <yulian@kuncheff.com>
+description: A simple modular task runner.
+homepage: https://github.com/Daegalus/peon
+dependencies:
+  logging: any
+  unittest: any
