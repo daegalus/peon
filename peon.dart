@@ -29,18 +29,18 @@ Future<Map> readConfiguration() {
         completer.complete(configuration);
       },
       onError: (AsyncError e) {
-        log.severe("Reading Peonfile.yaml failed.");
+        log.severe("Reading Peonfile.json failed.");
         log.severe(e.toString());
         completer.complete({});
       });
     } else {
-      log.severe("Peonfile.yaml does not exist.");
+      log.severe("Peonfile.json does not exist.");
       log.severe(e.toString());
       completer.complete({});
     }
   },
   onError: (AsyncError e) {
-    log.severe("Peonfile.yaml stating failed.");
+    log.severe("Peonfile.json stating failed.");
     log.severe(e.toString());
     completer.complete({});
   });
@@ -62,22 +62,25 @@ void runTask(String task) {
   taskFile.exists().then((bool exists) {
     if(exists) {
       Isolate.SendPort port = Isolate.spawnUri(taskFile.fullPathSync());
+      config[task]['taskName'] = task;
       port.call(config[task]).then((String result) {
-        print(result);
+        print('['+task+'] Completed');
       });
     } else {
       print('$task does not exist.');
     }
   });
 }
+
 void runPubTask(String pubTask) {
   File pubTaskFile = new File("packages/peon-${pubTask}/${pubTask}.dart");
   pubTaskFile.exists().then((bool exists) {
     if(exists) {
       print(pubTaskFile.fullPathSync());
       Isolate.SendPort port = Isolate.spawnUri(pubTaskFile.fullPathSync());
+      config[pubTask]['taskName'] = pubTask;
       port.call(config[pubTask]).then((String result) {
-        print(result);
+        print('['+pubTask+'] '+result);
       });
     } else {
       print('$pubTask does not exist.');

@@ -1,12 +1,11 @@
 import 'dart:isolate' as Isolate;
+import 'package:peon/peon_task.dart';
+import 'package:peon/peon_logger.dart';
 
 main() {
-  Isolate.ReceivePort port = Isolate.port;
-
-  port.receive((Map map, Isolate.SendPort replyTo) {
+  PeonTask.task((Map map, PeonLogger logger) {
     for(String file in map['files']) {
-      print("Generating Doc for $file");
+      logger.log("Generating Doc for $file");
     }
-    replyTo.call("[docgen] Theoretically should have run dartdoc on all files.").then((value) => print(value));
   });
 }
